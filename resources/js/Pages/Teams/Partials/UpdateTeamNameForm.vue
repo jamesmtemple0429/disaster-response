@@ -9,20 +9,9 @@
         </template>
 
         <template #form>
-            <!-- Team Owner Information -->
-            <div class="col-span-6">
-                <jet-label value="Team Owner" />
-
-                <div class="flex items-center mt-2">
-                    <img class="w-12 h-12 rounded-full object-cover" :src="team.owner.profile_photo_url" :alt="team.owner.name">
-
-                    <div class="ml-4 leading-tight">
-                        <div>{{ team.owner.name }}</div>
-                        <div class="text-gray-700 text-sm">{{ team.owner.email }}</div>
+                    <div class="col-span-6 max-w-xl text-sm text-gray-600" v-if="! hasPermission('teams.update')">
+                        You don't have permission to core settings for your team. If you believe this is a mistake, contact an Administrator.
                     </div>
-                </div>
-            </div>
-
             <!-- Team Name -->
             <div class="col-span-6 sm:col-span-4">
                 <jet-label for="name" value="Team Name" />
@@ -31,13 +20,62 @@
                             type="text"
                             class="mt-1 block w-full"
                             v-model="form.name"
-                            :disabled="! permissions.canUpdateTeam" />
+                            :disabled="! hasPermission('teams.update')"
+                />
 
                 <jet-input-error :message="form.errors.name" class="mt-2" />
             </div>
+
+            <template v-if="form.type != 4"> 
+             <div class="col-span-6 sm:col-span-4">
+                <jet-label for="type" value="Team Type" />
+
+                <jet-select id="type"
+                            class="mt-1 block w-full"
+                            v-model="form.type"
+                            :disabled="! hasPermission('teams.update')"
+                >
+                    <option value="1">Regional</option>
+                    <option value="2">Dispatch Center</option>
+                    <option value="3" v-if="team.type == 3 || $page.props.user.current_team.type === 4">Divisional</option>
+                </jet-select>
+
+                <jet-input-error :message="form.errors.type" class="mt-2" />
+            </div>
+
+            
+             <div class="col-span-6 sm:col-span-4" v-if="form.type !== 3">
+                <jet-label for="divisionID" value="Division Team" />
+
+                <jet-select id="divisionID"
+                            class="mt-1 block w-full"
+                            v-model="form.divisionID"
+                            :disabled="! hasPermission('teams.update')"
+                >
+                    <option v-for="team in divisionalTeams" :key="team.id" :value="team.id">{{ team.name }}</option>
+                </jet-select>
+
+                <jet-input-error :message="form.errors.divisionID" class="mt-2" />
+            </div>
+
+            
+             <div class="col-span-6 sm:col-span-4">
+                <jet-label for="nationalID" value="National Team" />
+
+                <jet-select id="nationalID"
+                            class="mt-1 block w-full"
+                            v-model="form.nationalID"
+                            :disabled="! hasPermission('teams.update')"
+                >
+                    <option v-for="team in nationalTeams" :key="team.id" :value="team.id">{{ team.name }}</option>
+                </jet-select>
+
+                <jet-input-error :message="form.errors.type" class="mt-2" />
+            </div>
+            </template>
         </template>
 
-        <template #actions v-if="permissions.canUpdateTeam">
+        <template #actions>
             <jet-action-message :on="form.recentlySuccessful" class="mr-3">
                 Saved.
             </jet-action-message>
@@ -55,6 +93,7 @@
     import JetButton from '@/Jetstream/Button'
     import JetFormSection from '@/Jetstream/FormSection'
     import JetInput from '@/Jetstream/Input'
+    import JetSelect from '@/Jetstream/Select'
     import JetInputError from '@/Jetstream/InputError'
     import JetLabel from '@/Jetstream/Label'
 
@@ -66,6 +105,34 @@
             JetInput,
             JetInputError,
             JetLabel,
+            JetSelect
+        },
+
+        created() {
+            axios.get("/api/teams")
+                .then((response) => {
+                    this.allTeams = response.data;
+
+                    this.nationalTeams = _.filter(response.data, (team) => {
+                        return team.type === 4;
+                    });
+
+                    this.form.nationalID = _.first(this.nationalTeams).id;
+
+                    this.divisionalTeams = _.filter(response.data, (team) => {
+                        return team.type === 3;
+                    });
+
+                    if(this.$page.props.user.current_team.type <= 2 || this.$page.props.user.current_team.type === 4) {
+                        this.divisionalTeams = _.filter(response.data, (team) => {
+                            return team.type === 3;
+                        });
+                    } else {
+                        this.divisionalTeams = _.filter(response.data, (team) => {
+                            return team.id === this.$page.props.user.current_team.id;
+                        });
+                    }
+                });
         },
 
         props: ['team', 'permissions'],
@@ -74,7 +141,13 @@
             return {
                 form: this.$inertia.form({
                     name: this.team.name,
-                })
+                    type: this.team.type,
+                    divisionID: this.team.division_id,
+                    nationalID: this.team.national_id
+                }),
+
+                nationalTeams: [],
+                divisionalTeams: []
             }
         },
 
@@ -85,6 +158,10 @@
                     preserveScroll: true
                 });
             },
+
+            hasPermission(permission) {
+                return this.$page.props.user.permissions.includes(permission) || this.$page.props.user.permissions.includes('*');
+            }
         },
     })
 </script>

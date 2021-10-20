@@ -24,6 +24,15 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+Route::middleware(['auth:sanctum', 'verified','password.change'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
+
+Route::post('teams/add-new-member','TeamMembersController@store')->name('teams.add-new-member');
+Route::put('change-role','ScopeController@changeRole')->name('scope.role.update');
+Route::put('change-team','ScopeController@changeTeam')->name('scope.team.update');
+Route::put('search-member','MemberSearchController@store')->name('members.search');
+Route::put('change-team-member-role/{team}/{user}','TeamMembersController@update')->name('teams.member.update');
+
+Route::put('regions/assign','AssignedRegionsController@assign')->name('assigned-regions.assign');
+Route::put('regions/unassign','AssignedRegionsController@unassign')->name('assigned-regions.unassign');

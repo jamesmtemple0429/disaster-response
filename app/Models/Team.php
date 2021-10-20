@@ -28,7 +28,10 @@ class Team extends JetstreamTeam
      */
     protected $fillable = [
         'name',
-        'personal_team',
+        'type',
+        'division_id',
+        'national_id',
+        'regions_served'
     ];
 
     /**

@@ -51,17 +51,52 @@ class JetstreamServiceProvider extends ServiceProvider
     {
         Jetstream::defaultApiTokenPermissions(['read']);
 
+        // 4 - National
         Jetstream::role('admin', 'Administrator', [
-            'create',
-            'read',
-            'update',
-            'delete',
+            '*'
         ])->description('Administrator users can perform any action.');
 
-        Jetstream::role('editor', 'Editor', [
-            'read',
-            'create',
-            'update',
-        ])->description('Editor users have the ability to read, create, and update.');
+        // 3 - Divisional
+        Jetstream::role('div-admin', 'Division Administrator', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+
+        Jetstream::role('div-leader', 'Division Leadership', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+
+        // Applies to both 1 - Regional & 2 - Dispatch
+        Jetstream::role('region-admin', 'Regional Administrator', [
+            'teams.update.own',
+            'teams.members.manage'
+        ])->description('Administrator users can perform any action.');
+
+        Jetstream::role('region-leader', 'Regional Leadership', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+
+        Jetstream::role('editor', 'Schedule Editor', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+
+
+        // 2 - Dispatch
+        Jetstream::role('dispatch-sv', 'Dispatch Supervisor', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+        Jetstream::role('dispatch', 'Dispatcher', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+
+        // 1 - Regional
+        Jetstream::role('dro', 'Call Center Liaison', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+        Jetstream::role('responder-sv', 'Responder Supervisor', [
+            '*'
+        ])->description('Administrator users can perform any action.');
+        Jetstream::role('responder', 'Responder', [
+            '*'
+        ])->description('Administrator users can perform any action.');
     }
 }

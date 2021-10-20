@@ -26,6 +26,9 @@ class UpdateTeamName implements UpdatesTeamNames
 
         $team->forceFill([
             'name' => $input['name'],
+            'type' => $input['type'],
+            'division_id' => (isset($input['divisionID'])) ? $input['divisionID'] : null,
+            'national_id' => (isset($input['nationalID'])) ? $input['nationalID'] : null
         ])->save();
     }
 }

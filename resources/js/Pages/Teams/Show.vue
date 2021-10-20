@@ -8,14 +8,18 @@
 
         <div>
             <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-                <update-team-name-form :team="team" :permissions="permissions" />
+                <update-team-name-form :team="team" :permissions="permissions" v-if="hasPermission('teams.update') || hasPermission('teams.update.own')" />
+
+                <assigned-regions :team="team" :permissions="permissions" v-if="team.type === 2" />
 
                 <team-member-manager class="mt-10 sm:mt-0"
                             :team="team"
                             :available-roles="availableRoles"
-                            :user-permissions="permissions" />
+                            :user-permissions="permissions"
+                            v-if="hasPermission('teams.members.manage')"
+                />
 
-                <template v-if="permissions.canDeleteTeam && ! team.personal_team">
+                <template v-if="hasPermission('teams.update')">
                     <jet-section-border />
 
                     <delete-team-form class="mt-10 sm:mt-0" :team="team" />
@@ -32,6 +36,7 @@
     import JetSectionBorder from '@/Jetstream/SectionBorder.vue'
     import TeamMemberManager from '@/Pages/Teams/Partials/TeamMemberManager.vue'
     import UpdateTeamNameForm from '@/Pages/Teams/Partials/UpdateTeamNameForm.vue'
+    import AssignedRegions from '@/Pages/Teams/Partials/AssignedRegions.vue'
 
     export default defineComponent({
         props: [
@@ -46,6 +51,13 @@
             JetSectionBorder,
             TeamMemberManager,
             UpdateTeamNameForm,
+            AssignedRegions
         },
+
+        methods: {
+            hasPermission(permission) {
+                return this.$page.props.user.permissions.includes(permission) || this.$page.props.user.permissions.includes("*");
+            },
+        }
     })
 </script>

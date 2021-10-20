@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Contracts\CreatesTeams;
 use Laravel\Jetstream\Events\AddingTeam;
 use Laravel\Jetstream\Jetstream;
+use App\Models\Team;
 
 class CreateTeam implements CreatesTeams
 {
@@ -23,14 +24,19 @@ class CreateTeam implements CreatesTeams
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
+            'type' => ['required','max:255']
         ])->validateWithBag('createTeam');
 
         AddingTeam::dispatch($user);
 
-        $user->switchTeam($team = $user->ownedTeams()->create([
-            'name' => $input['name'],
-            'personal_team' => false,
-        ]));
+        $team = Team::create([
+            'name'          => $input['name'],
+            'type'          => $input['type'],
+            'national_id'   => $input['nationalID'],
+            'division_id'   => ($input['divisionID'] === 0) ? null : $input['divisionID']
+        ]);
+
+        $team->users()->attach($user, ['roles' => json_encode([$user->current_role_id])]);
 
         return $team;
     }

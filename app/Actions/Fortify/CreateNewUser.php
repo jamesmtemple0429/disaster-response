@@ -23,7 +23,9 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input)
     {
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+            'firstName' => ['required', 'string', 'max:255'],
+            'lastName' => ['required', 'string', 'max:255'],
+            'memberID' => ['required', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['required', 'accepted'] : '',
@@ -31,9 +33,13 @@ class CreateNewUser implements CreatesNewUsers
 
         return DB::transaction(function () use ($input) {
             return tap(User::create([
-                'name' => $input['name'],
+                'first_name' => $input['firstName'],
+                'last_name' => $input['lastName'],
+                'member_id' => $input['memberID'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
+                'current_team_id' => 1,
+                'current_role_id' => 'admin'
             ]), function (User $user) {
                 $this->createTeam($user);
             });
@@ -48,10 +54,6 @@ class CreateNewUser implements CreatesNewUsers
      */
     protected function createTeam(User $user)
     {
-        $user->ownedTeams()->save(Team::forceCreate([
-            'user_id' => $user->id,
-            'name' => explode(' ', $user->name, 2)[0]."'s Team",
-            'personal_team' => true,
-        ]));
+        Team::find(1)->users()->attach($user, ['roles' => json_encode(['admin'])]);
     }
 }

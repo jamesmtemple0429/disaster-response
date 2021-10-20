@@ -9,6 +9,9 @@
         </template>
 
         <template #form>
+            <div class="col-span-6 max-w-xl text-sm text-red-600">
+                You must change your password before you can access this system.
+            </div>
             <div class="col-span-6 sm:col-span-4">
                 <jet-label for="current_password" value="Current Password" />
                 <jet-input id="current_password" type="password" class="mt-1 block w-full" v-model="form.current_password" ref="current_password" autocomplete="current-password" />

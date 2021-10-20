@@ -43,9 +43,15 @@
 
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <jet-label for="name" value="Name" />
-                <jet-input id="name" type="text" class="mt-1 block w-full" v-model="form.name" autocomplete="name" />
-                <jet-input-error :message="form.errors.name" class="mt-2" />
+                <jet-label for="firstName" value="First Name" />
+                <jet-input id="firstName" type="text" class="mt-1 block w-full" v-model="form.firstName" autocomplete="first_name" />
+                <jet-input-error :message="form.errors.firstName" class="mt-2" />
+            </div>
+
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="lastName" value="Last Name" />
+                <jet-input id="lastName" type="text" class="mt-1 block w-full" v-model="form.lastName" autocomplete="last_name" />
+                <jet-input-error :message="form.errors.lastName" class="mt-2" />
             </div>
 
             <!-- Email -->
@@ -53,6 +59,33 @@
                 <jet-label for="email" value="Email" />
                 <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" />
                 <jet-input-error :message="form.errors.email" class="mt-2" />
+            </div>
+            
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="memberId" value="Member ID" />
+                <jet-input id="memberId" type="text" class="mt-1 block w-full" v-model="form.memberId" autocomplete="member_id" />
+                <jet-input-error :message="form.errors.memberId" class="mt-2" />
+            </div>
+
+            <hr />
+
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="cellPhone" value="Cell Phone" />
+                <jet-input id="cellPhone" type="text" class="mt-1 block w-full" v-model="form.cellPhone" />
+                <jet-input-error :message="form.errors.cellPhone" class="mt-2" />
+            </div>
+            
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="homePhone" value="Home Phone" />
+                <jet-input id="homePhone" type="text" class="mt-1 block w-full" v-model="form.homePhone" />
+                <jet-input-error :message="form.errors.homePhone" class="mt-2" />
+            </div> 
+
+            
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="officePhone" value="Office Phone" />
+                <jet-input id="officePhone" type="text" class="mt-1 block w-full" v-model="form.officePhone" />
+                <jet-input-error :message="form.errors.officePhone" class="mt-2" />
             </div>
         </template>
 
@@ -95,7 +128,12 @@
             return {
                 form: this.$inertia.form({
                     _method: 'PUT',
-                    name: this.user.name,
+                    firstName: this.user.first_name,
+                    lastName: this.user.last_name,
+                    memberId: this.user.member_id,
+                    homePhone: this.user.home_phone,
+                    cellPhone: this.user.cell_phone,
+                    workPhone: this.user.work_phone,
                     email: this.user.email,
                     photo: null,
                 }),
